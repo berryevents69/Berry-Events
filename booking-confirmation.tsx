@@ -1,344 +1,336 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Calendar, MapPin, Phone, Mail, ArrowLeft, Download, Share2, MessageCircle } from "lucide-react";
-import { Link, useLocation } from "wouter";
-import { useToast } from "@/hooks/use-toast";
-import jsPDF from 'jspdf';
-import berryLogoPath from "@assets/Untitled (Logo) (2)_1763529143099.png";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { 
+  CheckCircle, 
+  Edit, 
+  MapPin, 
+  Calendar, 
+  Clock, 
+  User, 
+  CreditCard, 
+  Star,
+  Phone,
+  Mail,
+  Building,
+  ChefHat,
+  Sparkles
+} from "lucide-react";
 
-export default function BookingConfirmation() {
-  const [, setLocation] = useLocation();
-  const { toast } = useToast();
+interface BookingConfirmationProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onEditBooking: () => void;
+  bookingData: any;
+}
 
-  // In a real app, this would come from the booking data
-  const bookingDetails = {
-    bookingId: "BE-" + Date.now().toString().slice(-6),
-    service: "House Cleaning",
-    date: new Date(Date.now() + 86400000).toLocaleDateString('en-ZA', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    }),
-    time: "10:00 AM",
-    duration: "2 hours",
-    address: "123 Main Street, Cape Town, 8001",
-    amount: 560,
-    providerName: "Sarah Johnson",
-    providerPhone: "+27 82 123 4567",
-    customerEmail: "john.doe@example.com",
-    customerPhone: "+27 123 456 7890"
+export default function BookingConfirmation({
+  isOpen,
+  onClose,
+  onEditBooking,
+  bookingData
+}: BookingConfirmationProps) {
+  const [showProviderDetails, setShowProviderDetails] = useState(false);
+
+  const getServiceIcon = (serviceId: string) => {
+    switch (serviceId) {
+      case 'house-cleaning': return <Sparkles className="h-5 w-5" />;
+      case 'gardening': return <div className="h-5 w-5">🌿</div>;
+      case 'chef-catering': return <ChefHat className="h-5 w-5" />;
+      case 'plumbing': return <div className="h-5 w-5">🔧</div>;
+      case 'electrical': return <div className="h-5 w-5">⚡</div>;
+      case 'handyman': return <div className="h-5 w-5">🔨</div>;
+      case 'painting': return <div className="h-5 w-5">🎨</div>;
+      case 'waitering': return <User className="h-5 w-5" />;
+      default: return <Star className="h-5 w-5" />;
+    }
   };
 
-  // Generate PDF receipt
-  const generateCleanReceipt = () => {
-    const pdf = new jsPDF();
-    
-    // Set up the PDF
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const margin = 20;
-    let currentY = 20;
-    
-    // Add Berry Events logo
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx?.drawImage(img, 0, 0);
-      const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-      
-      // Add logo to PDF (centered, 40x40 size)
-      const logoSize = 30;
-      pdf.addImage(dataURL, 'JPEG', (pageWidth - logoSize) / 2, currentY, logoSize, logoSize);
-      
-      currentY += logoSize + 15;
-      
-      // Header - Berry Events branding
-      pdf.setFontSize(20);
-      pdf.setTextColor(124, 58, 237); // Purple color matching logo
-      pdf.text('BERRY EVENTS', pageWidth / 2, currentY, { align: 'center' });
-      
-      currentY += 12;
-      pdf.setFontSize(16);
-      pdf.setTextColor(0, 0, 0);
-      pdf.text('Booking Receipt', pageWidth / 2, currentY, { align: 'center' });
-      
-      currentY += 20;
-      
-      // Continue with the rest of the PDF generation
-      generatePDFContent(pdf, pageWidth, margin, currentY);
+  const getServiceName = (serviceId: string) => {
+    const services: { [key: string]: string } = {
+      'house-cleaning': 'House Cleaning',
+      'gardening': 'Garden Services',
+      'chef-catering': 'Chef & Catering',
+      'plumbing': 'Plumbing',
+      'electrical': 'Electrical',
+      'handyman': 'Handyman',
+      'painting': 'Painting',
+      'waitering': 'Waitering'
     };
-    
-    img.src = berryLogoPath;
-  };
-  
-  // Separate function for PDF content generation
-  const generatePDFContent = (pdf: jsPDF, pageWidth: number, margin: number, startY: number) => {
-    let currentY = startY;
-    
-    // Booking Reference
-    pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(`Booking Reference: ${bookingDetails.bookingId}`, pageWidth / 2, currentY, { align: 'center' });
-    
-    currentY += 25;
-    
-    // Service Details Section
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(12);
-    pdf.text('Service Details', margin, currentY);
-    
-    currentY += 10;
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Service: ${bookingDetails.service}`, margin, currentY);
-    
-    currentY += 8;
-    pdf.text(`Date: ${bookingDetails.date}`, margin, currentY);
-    
-    currentY += 8;
-    pdf.text(`Time: ${bookingDetails.time} (${bookingDetails.duration})`, margin, currentY);
-    
-    currentY += 8;
-    pdf.text(`Location: ${bookingDetails.address}`, margin, currentY);
-    
-    currentY += 20;
-    
-    // Service Provider Section
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Service Provider', margin, currentY);
-    
-    currentY += 10;
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Provider: ${bookingDetails.providerName}`, margin, currentY);
-    
-    currentY += 8;
-    pdf.text(`Contact: ${bookingDetails.providerPhone}`, margin, currentY);
-    
-    currentY += 20;
-    
-    // Payment Summary Section
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Payment Summary', margin, currentY);
-    
-    currentY += 15;
-    pdf.setFontSize(16);
-    pdf.setTextColor(5, 150, 105); // Green color
-    pdf.text(`Total Paid: R${bookingDetails.amount}`, pageWidth / 2, currentY, { align: 'center' });
-    
-    currentY += 10;
-    pdf.setFontSize(10);
-    pdf.setTextColor(0, 0, 0);
-    pdf.text('✓ Payment processed securely via Berry Events Bank', pageWidth / 2, currentY, { align: 'center' });
-    
-    // Footer
-    currentY = pdf.internal.pageSize.getHeight() - 40;
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(12);
-    pdf.text('Berry Events - Your trusted home services platform', pageWidth / 2, currentY, { align: 'center' });
-    
-    currentY += 8;
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(10);
-    pdf.text('Customer Service: customercare@berryevents.co.za | +27 61 279 6476', pageWidth / 2, currentY, { align: 'center' });
-    
-    currentY += 8;
-    pdf.text('Terms & Conditions apply. All services backed by Berry Events guarantee.', pageWidth / 2, currentY, { align: 'center' });
-    
-    // Save the PDF
-    pdf.save(`berry-events-receipt-${bookingDetails.bookingId}.pdf`);
-    
-    toast({
-      title: "PDF Receipt Downloaded!",
-      description: "Your booking receipt has been saved as a PDF with logo.",
-    });
+    return services[serviceId] || 'Service';
   };
 
-  // WhatsApp sharing functionality
-  const shareViaWhatsApp = () => {
-    const message = `🏡 Berry Events Booking Confirmed!
-
-📋 Reference: ${bookingDetails.bookingId}
-🛠️ Service: ${bookingDetails.service}
-📅 Date: ${bookingDetails.date}
-⏰ Time: ${bookingDetails.time}
-📍 Location: ${bookingDetails.address}
-👤 Provider: ${bookingDetails.providerName}
-💰 Amount: R${bookingDetails.amount}
-
-✅ Booking confirmed and payment processed securely!`;
-    
-    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-
-    toast({
-      title: "WhatsApp Opened!",
-      description: "Share your booking details with friends and family.",
+  const formatDateTime = (date: string, time: string) => {
+    if (!date) return 'Not specified';
+    const dateObj = new Date(date);
+    const formattedDate = dateObj.toLocaleDateString('en-ZA', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
-  };
-
-  // Email sharing functionality
-  const shareViaEmail = () => {
-    const subject = `Berry Events Booking Confirmation - ${bookingDetails.bookingId}`;
-    const body = `Dear Friend,
-
-I wanted to share my Berry Events booking details with you:
-
-Booking Reference: ${bookingDetails.bookingId}
-Service: ${bookingDetails.service}
-Date & Time: ${bookingDetails.date} at ${bookingDetails.time}
-Location: ${bookingDetails.address}
-Provider: ${bookingDetails.providerName}
-Amount Paid: R${bookingDetails.amount}
-
-Berry Events made it so easy to book reliable home services!
-
-Best regards`;
-    
-    const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
-
-    toast({
-      title: "Email App Opened!",
-      description: "Share your booking confirmation via email.",
-    });
+    return `${formattedDate} at ${time || 'Time TBD'}`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="text-center">
-          {/* Berry Events Logo */}
-          <div className="mx-auto mb-4">
-            <img 
-              src={berryLogoPath} 
-              alt="Berry Events Logo" 
-              className="h-20 w-auto mx-auto rounded-lg"
-              data-testid="berry-logo"
-            />
-          </div>
-          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-            <CheckCircle className="h-10 w-10 text-green-600" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-            Booking Confirmed!
-          </CardTitle>
-          <p className="text-gray-600">
-            Your service has been successfully booked and payment processed.
-          </p>
-        </CardHeader>
-        
-        <CardContent className="space-y-6">
-          {/* Booking Reference */}
-          <div className="text-center bg-blue-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600 mb-1">Booking Reference</p>
-            <p className="text-xl font-bold text-blue-600" data-testid="booking-id">
-              {bookingDetails.bookingId}
-            </p>
-          </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-3 text-2xl">
+            <CheckCircle className="h-8 w-8 text-green-600" />
+            <span>Booking Confirmed!</span>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Success Message */}
+          <Card className="bg-green-50 border-green-200">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-green-800 mb-2">
+                  Your booking has been confirmed!
+                </h3>
+                <p className="text-green-700">
+                  Booking Reference: <span className="font-mono font-bold">#{bookingData.bookingId}</span>
+                </p>
+                <p className="text-green-600 text-sm mt-2">
+                  You'll receive a confirmation email shortly with all the details.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Service Details */}
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <Calendar className="h-5 w-5 text-blue-600 mt-1" />
-              <div>
-                <p className="font-medium text-gray-900">{bookingDetails.service}</p>
-                <p className="text-sm text-gray-600">{bookingDetails.date}</p>
-                <p className="text-sm text-gray-600">{bookingDetails.time} ({bookingDetails.duration})</p>
-              </div>
-            </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center space-x-3">
+                {getServiceIcon(bookingData.serviceId)}
+                <span>{getServiceName(bookingData.serviceId)}</span>
+              </CardTitle>
+              <Button variant="outline" size="sm" onClick={onEditBooking}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Booking
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Service Address</p>
+                      <p className="text-gray-600">{bookingData.address || 'Not specified'}</p>
+                      <p className="text-sm text-gray-500">Property Type: {bookingData.propertyType || 'Not specified'}</p>
+                    </div>
+                  </div>
 
-            <div className="flex items-start space-x-3">
-              <MapPin className="h-5 w-5 text-green-600 mt-1" />
-              <div>
-                <p className="font-medium text-gray-900">Location</p>
-                <p className="text-sm text-gray-600">{bookingDetails.address}</p>
-              </div>
-            </div>
+                  <div className="flex items-start space-x-3">
+                    <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Date & Time</p>
+                      <p className="text-gray-600">{formatDateTime(bookingData.preferredDate, bookingData.timePreference)}</p>
+                      {bookingData.recurringSchedule !== 'one-time' && (
+                        <Badge variant="secondary" className="mt-1">
+                          {bookingData.recurringSchedule}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-            <div className="flex items-start space-x-3">
-              <Phone className="h-5 w-5 text-purple-600 mt-1" />
-              <div>
-                <p className="font-medium text-gray-900">{bookingDetails.providerName}</p>
-                <p className="text-sm text-gray-600">{bookingDetails.providerPhone}</p>
-                <p className="text-sm text-gray-500">⭐ 4.8 rating • Your service provider</p>
-              </div>
-            </div>
-          </div>
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <CreditCard className="h-5 w-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Total Cost</p>
+                      <p className="text-2xl font-bold text-green-600">R{bookingData.totalCost}</p>
+                      {bookingData.commission && (
+                        <p className="text-sm text-gray-500">Platform fee: R{bookingData.commission}</p>
+                      )}
+                    </div>
+                  </div>
 
-          {/* Payment Summary */}
-          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-medium text-gray-900">Total Paid</p>
-                <p className="text-xs text-green-700">✓ Secured by Berry Events Bank</p>
+                  <div className="flex items-start space-x-3">
+                    <Building className="h-5 w-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Payment Method</p>
+                      <p className="text-gray-600">Berry Events Bank</p>
+                      <p className="text-sm text-gray-500">Secure escrow protection</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p className="text-2xl font-bold text-green-600">R{bookingDetails.amount}</p>
-            </div>
-          </div>
 
-          {/* What's Next */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium text-gray-900 mb-2">What happens next?</h3>
-            <div className="text-sm text-gray-700 space-y-1">
-              <p>1. Confirmation email sent to {bookingDetails.customerEmail}</p>
-              <p>2. Provider will contact you 24 hours before service</p>
-              <p>3. Rate your experience after completion</p>
-            </div>
-          </div>
+              {/* Service-Specific Details */}
+              {bookingData.serviceId === 'chef-catering' && (
+                <div className="mt-4 p-4 bg-orange-50 rounded-lg">
+                  <h4 className="font-semibold text-orange-800 mb-2 flex items-center">
+                    <ChefHat className="h-4 w-4 mr-2" />
+                    Catering Details
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    {bookingData.cuisineType && (
+                      <div>
+                        <span className="font-medium">Cuisine:</span> {bookingData.cuisineType}
+                      </div>
+                    )}
+                    {bookingData.eventSize && (
+                      <div>
+                        <span className="font-medium">Event Size:</span> {bookingData.eventSize}
+                      </div>
+                    )}
+                    {bookingData.selectedMenu && (
+                      <div>
+                        <span className="font-medium">Menu:</span> {bookingData.selectedMenu}
+                      </div>
+                    )}
+                    {bookingData.dietaryRequirements?.length > 0 && (
+                      <div className="md:col-span-2">
+                        <span className="font-medium">Dietary Requirements:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {bookingData.dietaryRequirements.map((req: string, index: number) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {req}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Add-ons */}
+              {bookingData.selectedAddOns?.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Selected Add-ons</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {bookingData.selectedAddOns.map((addon: string, index: number) => (
+                      <Badge key={index} variant="secondary">
+                        {addon}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Provider Details */}
+          {bookingData.selectedProvider && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Your Service Provider</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowProviderDetails(!showProviderDetails)}
+                  >
+                    {showProviderDetails ? 'Hide Details' : 'View Details'}
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-start space-x-4">
+                  <img
+                    src={bookingData.selectedProvider.profileImage || '/placeholder-avatar.png'}
+                    alt={bookingData.selectedProvider.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-bold text-lg">{bookingData.selectedProvider.name}</h4>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="font-semibold ml-1">{bookingData.selectedProvider.rating}</span>
+                      </div>
+                      <span className="text-gray-500">({bookingData.selectedProvider.reviews} reviews)</span>
+                      <Badge variant="secondary">{bookingData.selectedProvider.experience}</Badge>
+                    </div>
+                    
+                    {showProviderDetails && (
+                      <div className="space-y-2 mt-4">
+                        <div className="flex items-center space-x-2 text-sm">
+                          <Phone className="h-4 w-4 text-gray-500" />
+                          <span>{bookingData.selectedProvider.phone || 'Will be shared closer to service date'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm">
+                          <Mail className="h-4 w-4 text-gray-500" />
+                          <span>{bookingData.selectedProvider.email || 'Contact through Berry Events'}</span>
+                        </div>
+                        {bookingData.selectedProvider.bio && (
+                          <p className="text-sm text-gray-600 mt-2">{bookingData.selectedProvider.bio}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Next Steps */}
+          <Card className="bg-blue-50 border-blue-200">
+            <CardHeader>
+              <CardTitle className="text-blue-800">What happens next?</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                <div>
+                  <p className="font-semibold">Provider Confirmation</p>
+                  <p className="text-sm text-gray-600">Your provider will confirm availability within 2 hours</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                <div>
+                  <p className="font-semibold">Service Preparation</p>
+                  <p className="text-sm text-gray-600">Provider will contact you 24 hours before to confirm details</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                <div>
+                  <p className="font-semibold">Service Completion</p>
+                  <p className="text-sm text-gray-600">Payment is released after you confirm service completion</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Action Buttons */}
-          <div className="space-y-3">
-            <div className="flex gap-3">
-              <Button
-                onClick={() => setLocation("/")}
-                variant="outline"
-                className="flex-1"
-                data-testid="button-home"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Home
-              </Button>
-              
-              <Button
-                onClick={generateCleanReceipt}
-                variant="outline"
-                className="flex-1"
-                data-testid="button-download"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Receipt
-              </Button>
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={shareViaWhatsApp}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                data-testid="button-share-whatsapp"
-              >
-                <MessageCircle className="h-4 w-4 mr-2" />
-                WhatsApp
-              </Button>
-              <Button
-                onClick={shareViaEmail}
-                variant="outline"
-                className="flex-1"
-                data-testid="button-share-email"
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                Email
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              size="lg" 
+              className="flex-1"
+              onClick={onClose}
+            >
+              Continue Browsing
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={onEditBooking}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit This Booking
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => window.print()}
+            >
+              Print Details
+            </Button>
           </div>
-
-          {/* Customer Service */}
-          <div className="text-center text-xs text-gray-500 pt-4 border-t">
-            <p>Need help? <strong>customercare@berryevents.co.za</strong> • <strong>+27 61 279 6476</strong></p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
