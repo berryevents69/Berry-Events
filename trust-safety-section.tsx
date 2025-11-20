@@ -1,0 +1,266 @@
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { 
+  Shield,
+  UserCheck,
+  CreditCard,
+  CheckCircle2,
+  Lock,
+  FileText,
+  Phone,
+  Clock,
+  Award,
+  Heart,
+  Star,
+  Users
+} from "lucide-react";
+
+const trustFeatures = [
+  {
+    icon: Shield,
+    title: "Comprehensive Insurance",
+    description: "All services covered by comprehensive insurance for your complete peace of mind",
+    details: ["Public liability coverage", "Property damage protection", "Personal injury coverage"],
+    color: "from-green-500 to-emerald-500"
+  },
+  {
+    icon: UserCheck,
+    title: "Verified Professionals",
+    description: "Every provider undergoes rigorous background checks and identity verification",
+    details: ["Criminal background checks", "Identity verification", "Reference validation"],
+    color: "from-blue-500 to-cyan-500"
+  },
+  {
+    icon: CreditCard,
+    title: "Secure Payments",
+    description: "Bank-grade security with escrow protection until service completion",
+    details: ["256-bit SSL encryption", "PCI DSS compliance", "Escrow protection"],
+    color: "from-purple-500 to-pink-500"
+  },
+  {
+    icon: Award,
+    title: "Quality Guarantee",
+    description: "100% satisfaction guarantee with free rework if you're not completely happy",
+    details: ["Satisfaction guarantee", "Free rework policy", "Quality standards"],
+    color: "from-orange-500 to-red-500"
+  }
+];
+
+const safetyStats = [
+  { 
+    value: "100%", 
+    label: "Providers Verified", 
+    icon: UserCheck,
+    description: "Every professional background-checked"
+  },
+  { 
+    value: "R50M+", 
+    label: "Insurance Coverage", 
+    icon: Shield,
+    description: "Comprehensive protection for all services"
+  },
+  { 
+    value: "24/7", 
+    label: "Support Available", 
+    icon: Phone,
+    description: "Round-the-clock customer assistance"
+  },
+  { 
+    value: "4.9/5", 
+    label: "Safety Rating", 
+    icon: Star,
+    description: "Outstanding safety track record"
+  }
+];
+
+const certifications = [
+  {
+    name: "ISO 27001",
+    description: "Information Security Management",
+    icon: Lock
+  },
+  {
+    name: "PCI DSS",
+    description: "Payment Security Standards",
+    icon: CreditCard
+  },
+  {
+    name: "POPIA Compliant",
+    description: "Data Protection & Privacy",
+    icon: FileText
+  },
+  {
+    name: "SANAS Accredited",
+    description: "Quality Management System",
+    icon: Award
+  }
+];
+
+export default function TrustSafetySection() {
+  return (
+    <section className="py-8 md:py-12 lg:py-16" style={{ backgroundColor: '#F7F2EF' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-5" style={{ color: '#44062D' }}>
+            Your safety is our priority
+          </h2>
+          <p className="text-xl max-w-2xl mx-auto" style={{ color: '#3C0920' }}>
+            We connect you to trusted, vetted, and dependable professionals.
+          </p>
+        </div>
+
+        {/* Trust Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {trustFeatures.map((feature, index) => (
+            <Card key={index} className="bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300 group">
+              <CardContent className="p-8">
+                {/* Icon */}
+                <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 mx-auto transition-colors duration-300" style={{ backgroundColor: 'rgba(197, 107, 134, 0.1)' }}>
+                  <feature.icon className="h-10 w-10" style={{ color: '#C56B86' }} />
+                </div>
+
+                {/* Content */}
+                <div className="text-center">
+                  <h3 className="text-xl font-bold mb-3" style={{ color: '#44062D' }}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#3C0920' }}>
+                    {feature.description}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Safety Stats */}
+        <div className="bg-white rounded-3xl p-8 lg:p-12 border shadow-lg mb-16" style={{ borderColor: '#EED1C4' }}>
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold mb-4" style={{ color: '#44062D' }}>
+              Safety by the Numbers
+            </h3>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#3C0920' }}>
+              Our commitment to safety and quality is reflected in these key metrics
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {safetyStats.map((stat, index) => (
+              <div key={index} className="text-center group">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300" style={{ backgroundColor: 'rgba(197, 107, 134, 0.1)' }}>
+                  <stat.icon className="h-8 w-8" style={{ color: '#C56B86' }} />
+                </div>
+                <div className="text-3xl font-bold mb-2" style={{ color: '#44062D' }} data-testid={`stat-${stat.label.toLowerCase().replace(' ', '-')}`}>
+                  {stat.value}
+                </div>
+                <div className="text-sm font-semibold mb-1" style={{ color: '#44062D' }}>
+                  {stat.label}
+                </div>
+                <div className="text-xs" style={{ color: '#3C0920' }}>
+                  {stat.description}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Verification Process */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+          {/* Process Steps */}
+          <div>
+            <Badge className="px-4 py-2 text-sm font-semibold border-0 mb-4 text-white" style={{ backgroundColor: '#C56B86' }}>
+              <UserCheck className="h-4 w-4 mr-2" />
+              Verification Process
+            </Badge>
+            <h3 className="text-3xl font-bold mb-6" style={{ color: '#44062D' }}>
+              How we verify every professional
+            </h3>
+            <p className="text-lg leading-relaxed mb-8" style={{ color: '#3C0920' }}>
+              Our multi-step verification process ensures only the most qualified and 
+              trustworthy professionals join our platform.
+            </p>
+
+            <div className="space-y-6">
+              {[
+                { step: 1, title: "Identity Verification", description: "Government ID and address verification" },
+                { step: 2, title: "Background Check", description: "Criminal background and reference checks" },
+                { step: 3, title: "Skills Assessment", description: "Practical skills testing and certification" },
+                { step: 4, title: "Insurance Validation", description: "Insurance coverage and documentation review" },
+                { step: 5, title: "Ongoing Monitoring", description: "Continuous performance and safety monitoring" }
+              ].map((item, index) => (
+                <div key={index} className="flex items-start space-x-4">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0" style={{ backgroundColor: '#C56B86' }}>
+                    {item.step}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold" style={{ color: '#44062D' }}>{item.title}</h4>
+                    <p className="text-sm" style={{ color: '#3C0920' }}>{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Visual */}
+          <div className="relative">
+            <div className="rounded-3xl p-8 border" style={{ backgroundColor: '#F7F2EF', borderColor: '#EED1C4' }}>
+              {/* Provider Card */}
+              <div className="bg-white rounded-2xl p-6 shadow-lg border" style={{ borderColor: '#EED1C4' }}>
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: '#C56B86' }}>
+                    <Users className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold" style={{ color: '#44062D' }}>Nomsa Mthembu</h4>
+                    <p className="text-sm" style={{ color: '#3C0920' }}>House Cleaning Professional</p>
+                  </div>
+                </div>
+
+                {/* Verification Badges */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="rounded-lg p-3 text-center" style={{ backgroundColor: 'rgba(197, 107, 134, 0.1)' }}>
+                    <CheckCircle2 className="h-6 w-6 mx-auto mb-1" style={{ color: '#C56B86' }} />
+                    <p className="text-xs font-semibold" style={{ color: '#44062D' }}>ID Verified</p>
+                  </div>
+                  <div className="rounded-lg p-3 text-center" style={{ backgroundColor: 'rgba(197, 107, 134, 0.1)' }}>
+                    <Shield className="h-6 w-6 mx-auto mb-1" style={{ color: '#C56B86' }} />
+                    <p className="text-xs font-semibold" style={{ color: '#44062D' }}>Background Checked</p>
+                  </div>
+                  <div className="rounded-lg p-3 text-center" style={{ backgroundColor: 'rgba(197, 107, 134, 0.1)' }}>
+                    <Award className="h-6 w-6 mx-auto mb-1" style={{ color: '#C56B86' }} />
+                    <p className="text-xs font-semibold" style={{ color: '#44062D' }}>Skills Certified</p>
+                  </div>
+                  <div className="rounded-lg p-3 text-center" style={{ backgroundColor: 'rgba(197, 107, 134, 0.1)' }}>
+                    <Heart className="h-6 w-6 mx-auto mb-1" style={{ color: '#C56B86' }} />
+                    <p className="text-xs font-semibold" style={{ color: '#44062D' }}>Insured</p>
+                  </div>
+                </div>
+
+                {/* Rating */}
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" style={{ color: '#C56B86' }} />
+                    ))}
+                  </div>
+                  <p className="text-sm" style={{ color: '#3C0920' }}>4.9 out of 5 (127 reviews)</p>
+                </div>
+              </div>
+
+              {/* Floating Verification Icons */}
+              <div className="absolute -top-4 -right-4 text-white rounded-full p-3 shadow-lg" style={{ backgroundColor: '#C56B86' }}>
+                <CheckCircle2 className="h-6 w-6" />
+              </div>
+              <div className="absolute -bottom-4 -left-4 text-white rounded-full p-3 shadow-lg" style={{ backgroundColor: '#C56B86' }}>
+                <Shield className="h-6 w-6" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </section>
+  );
+}
